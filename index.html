@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Viewer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #212121;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .channel-list {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .channel-btn {
+            padding: 10px 16px;
+            background-color: #333;
+            color: #fff;
+            border: 2px solid #555;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .channel-btn:active { background-color: #555; }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .blocked { color: #ff5555; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="allowed-section" style="display: none;">
+            <div class="channel-list">
+                <!-- UCをUUに変換した再生リストIDを指定 -->
+                <button class="channel-btn" onclick="changeChannel('UUrk3BDRC9xzEFMj9cGly6pQ')">まさのふろつぐ</button>
+                <button class="channel-btn" onclick="changeChannel('UUT3tWrUcsXmpOEF39q0VGnA')">BIGサイトウ</button>
+                <button class="channel-btn" onclick="changeChannel('UUYKJj4dLZuyS2TqcxFplmbw')">まるり64</button>
+            </div>
+
+            <div class="video-container">
+                <!-- referrerpolicy 属性を追加してエラー153を回避 -->
+                <iframe 
+                    id="live-player"
+                    src="https://www.youtube.com/embed?listType=playlist&list=UUrk3BDRC9xzEFMj9cGly6pQ" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div id="blocked-section" style="display: none;">
+            <h2 class="blocked">❌ 時間外です</h2>
+            <p>利用可能時間: 21:00 〜 23:30</p>
+        </div>
+    </div>
+
+    <script>
+        // プレイヤーのチャンネル（最新動画/配信）を切り替える関数
+        function changeChannel(listId) {
+            const player = document.getElementById('live-player');
+            player.src = "https://www.youtube.com/embed?listType=playlist&list=" + listId;
+        }
+
+        function checkTime() {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const startMinutes = 21 * 60;        // 21:00
+            const endMinutes = 23 * 60 + 30;    // 23:30
+
+            const isAllowed = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+
+            document.getElementById('allowed-section').style.display = isAllowed ? 'block' : 'none';
+            document.getElementById('blocked-section').style.display = isAllowed ? 'none' : 'block';
+        }
+
+        checkTime();
+        setInterval(checkTime, 10000);
+    </script>
+
+</body>
+</html>
